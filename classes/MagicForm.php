@@ -195,9 +195,15 @@ abstract class MagicForm extends ComponentBase {
         Event::fire('martin.forms.afterSaveRecord', [&$post]);
 
         // CHECK FOR REDIRECT
-        if (filter_var($this->property('redirect'), FILTER_VALIDATE_URL)) {
-            return Redirect::to($this->property('redirect'));
+        $redirectUrl = $this->property('redirect');
+        Event::fire('martin.forms.beforeRedirect', [&$redirectUrl]);
+
+        if (filter_var($redirectUrl, FILTER_VALIDATE_URL)) {
+            return Redirect::to($redirectUrl);
+        } else {
+            return Redirect::to($this->pageUrl($redirectUrl));
         }
+
 
         // GET DEFAULT SUCCESS MESSAGE
         $message = $this->property('messages_success');
